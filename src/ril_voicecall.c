@@ -301,7 +301,12 @@ static void ril_voicecall_lastcause_cb(GRilIoChannel *io, int status,
 
 		case CALL_FAIL_NORMAL_UNSPECIFIED:
 			call_status = ril_voicecall_status_with_id(vc, id);
-			if (call_status == OFONO_CALL_STATUS_ACTIVE ||
+			/* If call cid doesn't exist anymore, above method returns -1.
+			   This case can happen, when the cause response is received
+			   after the status response that removed the call from the
+			   list. We then assume that the remote is the cause. */
+			if (call_status == -1 ||
+			    call_status == OFONO_CALL_STATUS_ACTIVE ||
 			    call_status == OFONO_CALL_STATUS_HELD ||
 			    call_status == OFONO_CALL_STATUS_DIALING ||
 			    call_status == OFONO_CALL_STATUS_ALERTING) {
